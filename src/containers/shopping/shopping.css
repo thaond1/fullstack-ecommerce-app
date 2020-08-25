@@ -1,0 +1,23 @@
+.itemcontainer {
+    width: 85%;
+    float: right;
+    padding-bottom: 30px;
+}
+
+.shoppingcart {
+    position: absolute;
+    left: 95%;
+    top: 5%;
+    width: 30px;
+    height: 30px; 
+    cursor: pointer; 
+}
+
+.itemamount {
+    position: absolute;
+    padding: 1px;
+    left: 97.1%;
+    top: 3.9%;
+    background-color: black;
+    color: white;
+}

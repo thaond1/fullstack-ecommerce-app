@@ -1,0 +1,76 @@
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 20%;
+    margin: 1% 1%;
+    display: inline-block;
+    padding: 0.5% 0.5%;
+}
+  
+  /* On mouse-over, add a deeper shadow */
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.name {
+    min-height: 10px;
+    text-align: center;
+    margin-left: 4%;
+}
+
+.card > .imagebox > img {
+    max-width: 100%;
+    max-height: 350px;
+}
+
+.description {
+    height: 50px;
+    padding: 0 5px 0 12px;
+    text-align: left;
+}
+
+/* Add media screen selector for description and name, need to streamline*/
+@media only screen and (max-width: 1300px) {
+    .name {
+        height: 20px;
+    }
+    .description {
+        height: 70px;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .name {
+        height: 40px;
+    }
+    .description {
+        height: 120px;
+    }
+}
+
+.price {
+    display: inline-block;
+    width: 30%;
+}
+
+.amount {
+    display: inline-block;
+    width: 50%;
+    padding-left: 20%;
+}
+
+.viewbutton {
+    position: absolute;
+    width: 14%;
+    padding: 5px 0;
+    margin-left: -7%;
+    margin-top: -2%;
+    background-color:rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+}
+
+.viewbutton:hover {
+    background-color:rgba(255, 255, 255, 0.7);
+}
