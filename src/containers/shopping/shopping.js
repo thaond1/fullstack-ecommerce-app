@@ -4,48 +4,19 @@ import Viewitems from "../../components/viewitems/viewitems"
 import Cartitems from "../../components/cartitems/cartitems"
 import Viewmodal from "./viewmodal"
 import cart from "../../shopping-cart.png"
+import myInventory from "./inventory.json"
+
+/*
+    Important Note: cart contains {id, amount} where id is 
+    the index of the corresponding inventory item
+*/
 
 
 class Shopping extends Component {
 
-    // still need to integrate unique id for cart feature
-
     // modalItemId and addingItemAmount are used together when adding to cart
     state = {
-        inventory: [
-            {id: "001", name: "Bohomian Bed Frame", description: "Simple bed latform made from walnut wood and finished in Bohemian style.", 
-            amount: 20, price: 1.99, image: ["bed01-1.jpg", "bed01-2.jpg"]},
-            {id: "002", name: "Glasstop Work Desk", description: "Minimalistic desk toppped with high quality glass.", 
-            amount: 5, price: 2.99, image: ["desk01-1.jpg","desk01-2.jpg"]},
-            {id: "003", name: "Rustic Contemporary Dresser", description: "Made from ashwood, drawers are lined white felt for an embellished look.", 
-            amount: 3, price: 5, image: ["dresser01-1.jpg","dresser01-2.jpg"]},
-            {id: "004", name: "Sphere Floor Lamp", description: "Simple and elegant featuring sturdy bottom from beech wood and brass stand.", 
-            amount: 5, price: 5.25, image: ["lamp01-1.jpg","lamp01-2.jpg"]},
-            {id: "005", name: "Tall Side Table", description: "Inspired by folk design, perfect as an accent piece.", 
-            amount: 5, price: 3, image: ["side01-1.jpg","side01-2.jpg"]},
-            {id: "006", name: "Rattan Lounge Chair", description: "Crafted from sustainable wood, adds leisure and brightens up any space.", 
-            amount: 1, price: 15, image: ["chair01-1.jpg","chair01-2.jpg"]},
-            {id: "007", name: "Glasstop Coffee Table", description: "Adds a minimalistic, modern feel to your space. Steel frame in brass finish, tempered glass top.",
-            amount: 5, price: 15, image: ["side02-1.jpg","side02-2.jpg"]},
-            {id: "008", name: "Hanging Basket Shelf", description: "Three concentric shelves netted with wood and cotton.",
-            amount: 10, price: 20, image: ["shelf02-1.jpg","shelf02-2.jpg"]},
-            {id: "009", name: "Three Tier Shelf", description: "",
-            amount: 5, price: 15, image: ["shelf01-1.jpg","shelf01-2.jpg"]},
-            {id: "010", name: "Rattan Floor Mirror", description: "Rattan and iron mirror with basket for storage.",
-            amount: 5, price: 15, image: ["mirror01-1.jpg","mirror01-2.jpg"]},
-            {id: "011", name: "Bedside Light", description: "Simple yet glamorous. Iron and linen-mix.",
-            amount: 5, price: 10, image: ["lamp02-1.jpg","lamp02-2.jpg"]},
-            {id: "012", name: "Plush Armchair", description: "",
-            amount: 6, price: 10, image: ["chair02-1.jpg","chair02-2.jpg"]},
-            {id: "013", name: "", description: "",
-            amount: 1, price: 2, image: ["bed02-1.jpg","bed02-2.jpg"]},
-            {id: "014", name: "", description: "",
-            amount: 2, price: 2, image: ["plant01-1.jpg","plant01-2.jpg"]},
-            {id: "015", name: "Round Glasstop Table", description: "Round glasstop with crossing metal legs.",
-            amount: 2, price: 2, image: ["side03-1.jpg","side03-2.jpg"]},
-            {id: "016", name: "Long Sofa", description: "Deep cushioning for comfortable slouching, linen cover, oak legs.",
-            amount: 2, price: 3, image: ["sofa01-1.jpg","sofa01-2.jpg"]}
-        ],
+        inventory: JSON.parse(JSON.stringify(myInventory)),
         showModal: false,
         showCart: false,
         modalItemId: "",
@@ -54,11 +25,9 @@ class Shopping extends Component {
     }
 
     handleViewPopup = (itemId) => {
-        this.setState({showModal: true, modalItemId: itemId});
-        console.log("handleViewPopup was called")
+        this.setState({showModal: true, modalItemId: itemId}, ()=>{console.log(itemId)});
     }
 
-    // bind function to close button of modal, or when clicked outside
     closeViewPopup = () => {
         this.setState({showModal: false});
     }
@@ -68,22 +37,87 @@ class Shopping extends Component {
         event.preventDefault();
     }
 
+    // can refactor code here?
     submitToCart = (event) => {
-        this.setState({cart: [...this.state.cart, {id: this.state.modalItemId, amount: this.state.addingItemAmount}]});
-        this.closeViewPopup();
-        event.preventDefault();
-        console.log(this.state.cart);
+        var itemInCart = this.state.cart.find(i => i.id == this.state.modalItemId)
+        if (itemInCart == undefined) {      // item not yet in cart
+            this.setState({cart: [...this.state.cart, {id: this.state.modalItemId, amount: parseInt(this.state.addingItemAmount)}]},
+                () => {this.closeViewPopup();
+                    event.persist();
+                    console.log(this.state.cart);});
+        }
+        else {                              // item already in cart, adding more
+            var currentAmount = itemInCart.amount;
+            var inventoryAmount = parseInt(this.state.inventory[this.state.modalItemId].amount)    // modalItemId is index of inventory list
+            var cartIndex = this.state.cart.findIndex( i => i.id==this.state.modalItemId )
+            var newCart = [...this.state.cart]
+            if ((currentAmount+parseInt(this.state.addingItemAmount)) > inventoryAmount) {  // if exceeding max amount in stock
+                console.log("Here")
+                newCart[cartIndex].amount = inventoryAmount;    // add maximum amount to cart instead
+                this.setState({cart: newCart},
+                    () => {this.closeViewPopup();
+                        event.persist();
+                        window.alert("Amount exceeds items in stock. Adding all items in inventory.");
+                        console.log(this.state.cart);});
+            }
+            else {                          // not exceeding max amount in stock, sum up two amounts
+                console.log("Here instead")
+                newCart[cartIndex].amount = parseInt(this.state.addingItemAmount)+currentAmount
+                this.setState({cart: newCart},
+                    () => {this.closeViewPopup();
+                        event.persist();
+                        console.log(this.state.cart);});
+            }
+        }
     }
 
     viewCart = () => {
         // also check if cart is non-empty
         // if cart empty, show alert message
-        this.setState({showCart: true});
+        if (this.state.cart.length > 0) {
+            this.setState({showCart: true});
+        }
+        else {
+            window.alert("Your cart is currently empty.")
+        }
     }
 
     closeCart = () => {
         this.setState({showCart: false});
     }
+
+    // CHECK INCREMENT AND DECREMENT FUNCTIONS
+
+    // Note: cartId is index in inventory
+    incrementCart = (cartId) => {
+        console.log("Inside incrementCart function");
+        // check if increment will exceed max in stock
+        var inventoryIndex = parseInt(cartId);
+        var cartAmount = this.state.cart.find( item => item.id == cartId).amount;
+        var inventoryAmount = this.state.inventory[inventoryIndex].amount;
+        if (cartAmount+1 <= inventoryAmount) {   // no, increment
+            var newCart = [...this.state.cart];
+            (newCart[this.state.cart.findIndex( item => item.id == cartId)].amount)++;
+            this.setState({cart: newCart});
+        }
+    }
+
+    decrementCart = (cartId) => {
+        console.log("Inside decrementCart function");
+        // check if decrement will delete item
+        var cartAmount = this.state.cart.find( item => item.id == cartId).amount;
+        if (cartAmount-1 > 0) {     // no, decrement
+            var newCart = [...this.state.cart];
+            (newCart[this.state.cart.findIndex( item => item.id == cartId)].amount)--;
+            this.setState({cart: newCart});
+        }
+        else {              // remove from cart
+            var newCart = [...this.state.cart];
+            newCart.splice(this.state.cart.findIndex( item => item.id == cartId), 1);
+            this.setState({cart: newCart});
+        }
+    }
+
 
     render() {
 
@@ -118,7 +152,10 @@ class Shopping extends Component {
                     <Cartitems
                     inventory={this.state.inventory}
                     cart={this.state.cart}
-                    ></Cartitems>
+                    closecart={this.closeCart}
+                    increment={this.incrementCart}
+                    decrement={this.decrementCart}>
+                    </Cartitems>
                 </div>
                 :null}
 
