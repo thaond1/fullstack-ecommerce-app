@@ -2,6 +2,7 @@
     width: 85%;
     float: right;
     padding-bottom: 30px;
+    margin-right: -5%;
 }
 
 .shoppingcart {
@@ -15,20 +16,32 @@
 
 .itemamount {
     position: absolute;
-    padding: 1px;
+    padding: 1px 3px;
     left: 97.1%;
     top: 3.9%;
-    background-color: black;
+    background-color: rgb(80, 79, 79);
     color: white;
 }
 
-.modalspace {
-    width: 50%;
-    height: 70%;
-    margin: 10% auto;
-    overflow-x: auto;
-    overflow-y: auto;
+.categories {
+    width: 18%;
+    margin-left: 1%;
+    float: left;
+    padding: 1% 0;
+}
+
+.filterbutton {
+    width: 95%;
+    margin: 2% auto;
+    padding: 9px 0;
+    display: inline-block;
     background-color: white;
-    padding: 10px;
-    z-index: 1;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2);
+    outline: none;
+}
+
+.filterbutton:hover{
+    text-decoration: underline;
 }

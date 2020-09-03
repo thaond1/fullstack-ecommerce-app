@@ -22,6 +22,7 @@ class Shopping extends Component {
         modalItemId: "",
         addingItemAmount: 0,
         cart: [],
+        filter: "all"
     }
 
     handleViewPopup = (itemId) => {
@@ -120,6 +121,10 @@ class Shopping extends Component {
 
 
     render() {
+        let filteredList = this.state.inventory;
+        if (this.state.filter != "all") {
+            filteredList = this.state.inventory.filter( item => item.category == this.state.filter)
+        }
 
         // using index to locate item to be displayed but can be changed (bind(this,item.index)=>item.id)
         return (
@@ -159,9 +164,16 @@ class Shopping extends Component {
                 </div>
                 :null}
 
+                <div className="categories">
+                    <button className="filterbutton" onClick={() => this.setState({filter:"all"})}>All</button>
+                    <button className="filterbutton" onClick={() => this.setState({filter:"living"})}>Living</button>
+                    <button className="filterbutton" onClick={() => this.setState({filter:"bedroom"})}>Bedroom</button>
+                    <button className="filterbutton" onClick={() => this.setState({filter:"storage"})}>Storage</button>
+                    <button className="filterbutton" onClick={() => this.setState({filter:"lighting"})}>Lighting</button>
+                </div>
 
                 <div className="itemcontainer">
-                    {this.state.inventory.map( (item,index) => {
+                    {filteredList.map( (item,index) => {
                         return <Viewitems 
                         name={item.name}
                         description={item.description}
