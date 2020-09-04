@@ -19,6 +19,7 @@ class Shopping extends Component {
             inventory: [],
             showModal: false,
             showCart: false,
+            onCheckout: false,
             modalItemId: "",
             addingItemAmount: 0,
             cart: [],
@@ -100,11 +101,28 @@ class Shopping extends Component {
         this.setState({showCart: false});
     }
 
-    // CHECK INCREMENT AND DECREMENT FUNCTIONS
+    checkout = () => {
+        // make call to fetch /checkout
+        console.log("body of POST", JSON.stringify({myCart: this.state.cart}))
+        fetch('/checkout', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({myCart: this.state.cart}) // not passing money amount for security reasons
+        })
+            .then(res => res.json())
+            .then(responseJson => {var clientSecret = responseJson.client_secret; console.log(clientSecret)})
+        // When server returns with intent, set onCheckout state to show payment modal
+        // When user submits card info, call stripe.confirmCardPayment() with the client secret.
+        this.setState({onCheckout: true})
+        console.log("Success! Set state and client secret.")
+    }
+
 
     // Note: cartId is index in inventory
     incrementCart = (cartId) => {
-        console.log("Inside incrementCart function");
         // check if increment will exceed max in stock
         var inventoryIndex = parseInt(cartId);
         var cartAmount = this.state.cart.find( item => item.id === cartId).amount;
@@ -117,7 +135,6 @@ class Shopping extends Component {
     }
 
     decrementCart = (cartId) => {
-        console.log("Inside decrementCart function");
         // check if decrement will delete item
         var cartAmount = this.state.cart.find( item => item.id === cartId).amount;
         var newCart = [...this.state.cart];
@@ -149,6 +166,16 @@ class Shopping extends Component {
                     }
                 </div>
                 
+                {(this.state.onCheckout)? 
+                <div className="checkoutmodal">
+                    {/* displays money amount, place to provided card information, address, etc.
+                        will use the checkout container here*/}
+
+
+
+
+                </div>
+                :null}
 
                 {(this.state.showModal)?
                 <div>
@@ -171,7 +198,8 @@ class Shopping extends Component {
                     cart={this.state.cart}
                     closecart={this.closeCart}
                     increment={this.incrementCart}
-                    decrement={this.decrementCart}>
+                    decrement={this.decrementCart}
+                    checkout={this.checkout}>
                     </Cartitems>
                 </div>
                 :null}

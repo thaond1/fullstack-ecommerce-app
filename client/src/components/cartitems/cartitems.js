@@ -36,7 +36,7 @@ const cartitem = (props) => {
                     )
                 } )}
                 <p> Total: ${total.toFixed(2)} </p>
-                <button className="checkout">Checkout</button>
+                <button type="submit" className="checkout" onClick={props.checkout}>Checkout</button>
             </div>
         </div>
     )
