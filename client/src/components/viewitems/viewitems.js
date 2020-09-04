@@ -1,7 +1,7 @@
 import React, {useState} from "react"
 import "./viewitems.css"
 
-const viewitem = (props) => {
+const Viewitem = (props) => {
     const [buttonState, setButtonState] = useState({
         showViewButton: false
     })
@@ -35,4 +35,4 @@ const viewitem = (props) => {
     )
 }
 
-export default viewitem;
+export default Viewitem;

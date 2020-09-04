@@ -4,7 +4,6 @@ import Viewitems from "../../components/viewitems/viewitems"
 import Cartitems from "../../components/cartitems/cartitems"
 import Viewmodal from "./viewmodal"
 import cart from "../../shopping-cart.png"
-import myInventory from "./inventory.json"
 
 /*
     Important Note: cart contains {id, amount} where id is 
@@ -13,16 +12,24 @@ import myInventory from "./inventory.json"
 
 
 class Shopping extends Component {
-
     // modalItemId and addingItemAmount are used together when adding to cart
-    state = {
-        inventory: JSON.parse(JSON.stringify(myInventory)),
-        showModal: false,
-        showCart: false,
-        modalItemId: "",
-        addingItemAmount: 0,
-        cart: [],
-        filter: "all"
+    constructor() {
+        super();
+        this.state = {
+            inventory: [],
+            showModal: false,
+            showCart: false,
+            modalItemId: "",
+            addingItemAmount: 0,
+            cart: [],
+            filter: "all"
+        }
+    }
+
+    componentDidMount() {
+        fetch('/inventory')
+            .then(res => res.json())
+            .then(myinventory => this.setState({inventory: myinventory}))
     }
 
     handleViewPopup = (itemId) => {
@@ -38,22 +45,29 @@ class Shopping extends Component {
         event.preventDefault();
     }
 
-    // can refactor code here?
     submitToCart = (event) => {
-        var itemInCart = this.state.cart.find(i => i.id == this.state.modalItemId)
-        if (itemInCart == undefined) {      // item not yet in cart
-            this.setState({cart: [...this.state.cart, {id: this.state.modalItemId, amount: parseInt(this.state.addingItemAmount)}]},
-                () => {this.closeViewPopup();
-                    event.persist();
-                    console.log(this.state.cart);});
+        var index = this.state.modalItemId
+        if (this.state.filter !== "all") {  // filtered, need to find actual index in inventory from this.state.modalItemId
+            var filtered = this.state.inventory.filter( item => item.category === this.state.filter)
+            var itemToAdd = filtered[this.state.modalItemId]
+            index = this.state.inventory.findIndex(i => i==itemToAdd)
+        }
+        var itemInCart = this.state.cart.find(i => i.id === index)
+
+        if (itemInCart === undefined) {      // item not yet in cart
+            
+            this.setState({cart: [...this.state.cart, {id: index, amount: parseInt(this.state.addingItemAmount)}]},
+            () => {this.closeViewPopup();
+                event.persist();
+                console.log(this.state.cart);})
         }
         else {                              // item already in cart, adding more
             var currentAmount = itemInCart.amount;
-            var inventoryAmount = parseInt(this.state.inventory[this.state.modalItemId].amount)    // modalItemId is index of inventory list
-            var cartIndex = this.state.cart.findIndex( i => i.id==this.state.modalItemId )
+            var inventoryAmount = parseInt(this.state.inventory[index].amount)    // modalItemId is index of inventory list
+            var cartIndex = this.state.cart.findIndex( i => i.id===index )
             var newCart = [...this.state.cart]
+            window.alert("in else")
             if ((currentAmount+parseInt(this.state.addingItemAmount)) > inventoryAmount) {  // if exceeding max amount in stock
-                console.log("Here")
                 newCart[cartIndex].amount = inventoryAmount;    // add maximum amount to cart instead
                 this.setState({cart: newCart},
                     () => {this.closeViewPopup();
@@ -62,7 +76,6 @@ class Shopping extends Component {
                         console.log(this.state.cart);});
             }
             else {                          // not exceeding max amount in stock, sum up two amounts
-                console.log("Here instead")
                 newCart[cartIndex].amount = parseInt(this.state.addingItemAmount)+currentAmount
                 this.setState({cart: newCart},
                     () => {this.closeViewPopup();
@@ -94,11 +107,11 @@ class Shopping extends Component {
         console.log("Inside incrementCart function");
         // check if increment will exceed max in stock
         var inventoryIndex = parseInt(cartId);
-        var cartAmount = this.state.cart.find( item => item.id == cartId).amount;
+        var cartAmount = this.state.cart.find( item => item.id === cartId).amount;
         var inventoryAmount = this.state.inventory[inventoryIndex].amount;
         if (cartAmount+1 <= inventoryAmount) {   // no, increment
             var newCart = [...this.state.cart];
-            (newCart[this.state.cart.findIndex( item => item.id == cartId)].amount)++;
+            (newCart[this.state.cart.findIndex( item => item.id === cartId)].amount)++;
             this.setState({cart: newCart});
         }
     }
@@ -106,15 +119,14 @@ class Shopping extends Component {
     decrementCart = (cartId) => {
         console.log("Inside decrementCart function");
         // check if decrement will delete item
-        var cartAmount = this.state.cart.find( item => item.id == cartId).amount;
+        var cartAmount = this.state.cart.find( item => item.id === cartId).amount;
+        var newCart = [...this.state.cart];
         if (cartAmount-1 > 0) {     // no, decrement
-            var newCart = [...this.state.cart];
-            (newCart[this.state.cart.findIndex( item => item.id == cartId)].amount)--;
+            (newCart[this.state.cart.findIndex( item => item.id === cartId)].amount)--;
             this.setState({cart: newCart});
         }
         else {              // remove from cart
-            var newCart = [...this.state.cart];
-            newCart.splice(this.state.cart.findIndex( item => item.id == cartId), 1);
+            newCart.splice(this.state.cart.findIndex( item => item.id === cartId), 1);
             this.setState({cart: newCart});
         }
     }
@@ -122,8 +134,8 @@ class Shopping extends Component {
 
     render() {
         let filteredList = this.state.inventory;
-        if (this.state.filter != "all") {
-            filteredList = this.state.inventory.filter( item => item.category == this.state.filter)
+        if (this.state.filter !== "all") {
+            filteredList = this.state.inventory.filter( item => item.category === this.state.filter)
         }
 
         // using index to locate item to be displayed but can be changed (bind(this,item.index)=>item.id)
@@ -141,11 +153,11 @@ class Shopping extends Component {
                 {(this.state.showModal)?
                 <div>
                     <Viewmodal
-                    name={this.state.inventory[this.state.modalItemId].name}
-                    description={this.state.inventory[this.state.modalItemId].description}
-                    amount={this.state.inventory[this.state.modalItemId].amount}
-                    price={this.state.inventory[this.state.modalItemId].price}
-                    image={this.state.inventory[this.state.modalItemId].image}
+                    name={filteredList[this.state.modalItemId].name}
+                    description={filteredList[this.state.modalItemId].description}
+                    amount={filteredList[this.state.modalItemId].amount}
+                    price={filteredList[this.state.modalItemId].price}
+                    image={filteredList[this.state.modalItemId].image}
                     closemodal={this.closeViewPopup}
                     addtocart={this.addingToCart}
                     submitcart={this.submitToCart}

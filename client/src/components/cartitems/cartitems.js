@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React from "react"
 import "./cartitems.css"
 // Use a state to maintain item amount when incr/decr with buttons
 // Then when button clicked, update state here and also call decrementCart/incrementCart functions in shopping.js

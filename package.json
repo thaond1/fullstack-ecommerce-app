@@ -1,16 +1,19 @@
 {
-  "name": "online-grocery",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "1.1.5"
-  },
+  "name": "online-shopping",
+  "version": "1.0.0",
+  "description": "Full Stack Express and React Project",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "node server.js",
+    "server": "nodemon server.js"
+  },
+  "author": "Serena Do",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^5.3.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }

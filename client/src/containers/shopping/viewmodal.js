@@ -3,7 +3,7 @@ import "./viewmodal.css"
 
                     
 
-const viewmodal = (props) => {
+const Viewmodal = (props) => {
     // modal needs to be clicked outside only to close
     const [imageState, setImageState] = useState({
         image: 0,
@@ -42,4 +42,4 @@ const viewmodal = (props) => {
     );
 }
 
-export default viewmodal;
+export default Viewmodal;
