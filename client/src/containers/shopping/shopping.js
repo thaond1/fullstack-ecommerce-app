@@ -1,4 +1,8 @@
 import React, {Component} from "react"
+import {Elements} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
+
+import CheckoutForm from '../checkout/CheckoutForm';
 import "./shopping.css"
 import Viewitems from "../../components/viewitems/viewitems"
 import Cartitems from "../../components/cartitems/cartitems"
@@ -10,6 +14,7 @@ import cart from "../../shopping-cart.png"
     the index of the corresponding inventory item
 */
 
+const stripePromise = loadStripe("pk_test_51HMbwoHlAknTTFclFX9flu2gFYw5F6M3EA0wjLso2UQX3tCRJnqnTadcX3tJ9F7aAn7W6nmTjl1EtU3ck6J30LjN00mplj1f3s");
 
 class Shopping extends Component {
     // modalItemId and addingItemAmount are used together when adding to cart
@@ -23,7 +28,9 @@ class Shopping extends Component {
             modalItemId: "",
             addingItemAmount: 0,
             cart: [],
-            filter: "all"
+            filter: "all",
+            clientSecret: undefined,
+            taxPercent: 0,      // returned from server side
         }
     }
 
@@ -113,7 +120,7 @@ class Shopping extends Component {
             body: JSON.stringify({myCart: this.state.cart}) // not passing money amount for security reasons
         })
             .then(res => res.json())
-            .then(responseJson => {var clientSecret = responseJson.client_secret; console.log(clientSecret)})
+            .then(responseJson => {this.setState({clientSecret: responseJson.client_secret, taxPercent: responseJson.tax_percent})})
         // When server returns with intent, set onCheckout state to show payment modal
         // When user submits card info, call stripe.confirmCardPayment() with the client secret.
         this.setState({onCheckout: true})
@@ -148,6 +155,9 @@ class Shopping extends Component {
         }
     }
 
+    redirectToHome = () => {
+        this.setState({onCheckout: false, clientSecret: undefined, taxPercent: 0, showCart: false, cart: []})
+    }
 
     render() {
         let filteredList = this.state.inventory;
@@ -157,74 +167,80 @@ class Shopping extends Component {
 
         // using index to locate item to be displayed but can be changed (bind(this,item.index)=>item.id)
         return (
+
+            // USE STATE OF ONCHECKOUT HERE: IF TRUE, DISPLAY CHECKOUT COMPONENT, ELSE DISPLAYS APP
             <div>
+                {(this.state.onCheckout)?
+                    <div className="checkoutmodal">
+                    {/* displays money amount, place to provided card information, address, etc.
+                        will use the checkout container here, when done remember to reset clientsecret*/}
+                    <Elements stripe={stripePromise}>
+                        <CheckoutForm clientsecret={this.state.clientSecret}
+                        cart={this.state.cart}
+                        inventory={this.state.inventory}
+                        tax={this.state.taxPercent}
+                        redirect={this.redirectToHome}/>
+                    </Elements>
+                    </div>
+                :
                 <div>
+                    <div>
                     <img className="shoppingcart" onClick={this.viewCart} src={cart}/> 
                     {   (this.state.cart.length > 0)?
                         <div className="itemamount"> {this.state.cart.reduce( (cart,item) => cart+ parseInt(item.amount), 0)} </div>
                         :null
                     }
+                    </div>
+                    {(this.state.showModal)?
+                    <div>
+                        <Viewmodal
+                        name={filteredList[this.state.modalItemId].name}
+                        description={filteredList[this.state.modalItemId].description}
+                        amount={filteredList[this.state.modalItemId].amount}
+                        price={filteredList[this.state.modalItemId].price}
+                        image={filteredList[this.state.modalItemId].image}
+                        closemodal={this.closeViewPopup}
+                        addtocart={this.addingToCart}
+                        submitcart={this.submitToCart}
+                        ></Viewmodal>
+                    </div>: null}
+
+                    {(this.state.showCart)?
+                    <div>
+                        <Cartitems
+                        inventory={this.state.inventory}
+                        cart={this.state.cart}
+                        closecart={this.closeCart}
+                        increment={this.incrementCart}
+                        decrement={this.decrementCart}
+                        checkout={this.checkout}>
+                        </Cartitems>
+                    </div>
+                    :null}
+
+                    <div className="categories">
+                        <button className="filterbutton" onClick={() => this.setState({filter:"all"})}>All</button>
+                        <button className="filterbutton" onClick={() => this.setState({filter:"living"})}>Living</button>
+                        <button className="filterbutton" onClick={() => this.setState({filter:"bedroom"})}>Bedroom</button>
+                        <button className="filterbutton" onClick={() => this.setState({filter:"storage"})}>Storage</button>
+                        <button className="filterbutton" onClick={() => this.setState({filter:"lighting"})}>Lighting</button>
+                    </div>
+
+                    <div className="itemcontainer">
+                        {filteredList.map( (item,index) => {
+                            return <Viewitems 
+                            name={item.name}
+                            description={item.description}
+                            amount={item.amount}
+                            price={item.price}
+                            image={item.image[0]}
+                            key={item.id}
+                            quickview={this.handleViewPopup.bind(this,index)}>
+                            </Viewitems>
+                        })} 
+                    </div>
                 </div>
-                
-                {(this.state.onCheckout)? 
-                <div className="checkoutmodal">
-                    {/* displays money amount, place to provided card information, address, etc.
-                        will use the checkout container here*/}
-
-
-
-
-                </div>
-                :null}
-
-                {(this.state.showModal)?
-                <div>
-                    <Viewmodal
-                    name={filteredList[this.state.modalItemId].name}
-                    description={filteredList[this.state.modalItemId].description}
-                    amount={filteredList[this.state.modalItemId].amount}
-                    price={filteredList[this.state.modalItemId].price}
-                    image={filteredList[this.state.modalItemId].image}
-                    closemodal={this.closeViewPopup}
-                    addtocart={this.addingToCart}
-                    submitcart={this.submitToCart}
-                    ></Viewmodal>
-                </div>: null}
-
-                {(this.state.showCart)?
-                <div>
-                    <Cartitems
-                    inventory={this.state.inventory}
-                    cart={this.state.cart}
-                    closecart={this.closeCart}
-                    increment={this.incrementCart}
-                    decrement={this.decrementCart}
-                    checkout={this.checkout}>
-                    </Cartitems>
-                </div>
-                :null}
-
-                <div className="categories">
-                    <button className="filterbutton" onClick={() => this.setState({filter:"all"})}>All</button>
-                    <button className="filterbutton" onClick={() => this.setState({filter:"living"})}>Living</button>
-                    <button className="filterbutton" onClick={() => this.setState({filter:"bedroom"})}>Bedroom</button>
-                    <button className="filterbutton" onClick={() => this.setState({filter:"storage"})}>Storage</button>
-                    <button className="filterbutton" onClick={() => this.setState({filter:"lighting"})}>Lighting</button>
-                </div>
-
-                <div className="itemcontainer">
-                    {filteredList.map( (item,index) => {
-                        return <Viewitems 
-                        name={item.name}
-                        description={item.description}
-                        amount={item.amount}
-                        price={item.price}
-                        image={item.image[0]}
-                        key={item.id}
-                        quickview={this.handleViewPopup.bind(this,index)}>
-                        </Viewitems>
-                    })} 
-                </div>
+                }
             </div>
             
         );

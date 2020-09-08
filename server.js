@@ -51,19 +51,20 @@ const inventory = [
 app.post('/checkout', async(req, res) => {
   // Compute price from cart data sent from client
   var cart = req.body.myCart
+  var taxPercent = 0.08
   console.log("Cart received on server side", cart)
   var price = cart.reduce( (accumulator, item) => {
     return accumulator + inventory[item.id].price * item.amount
   }, 0)
   // Here we will make a request to the Stripe to get a payment intent
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: price*100,  // Strip takes price in cents
+    amount: (price*100 + Math.round(price*taxPercent*100)),  // Strip takes price in cents
     currency: 'usd',
     // Verify your integration in this guide by including this parameter
     metadata: {integration_check: 'accept_a_payment'},
   });
   // returns paymentIntent from Stripe to client
-  res.json({client_secret: paymentIntent.client_secret})
+  res.json({client_secret: paymentIntent.client_secret, tax_percent: taxPercent})
 })
 
 

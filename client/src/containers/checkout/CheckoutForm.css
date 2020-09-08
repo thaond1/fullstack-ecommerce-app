@@ -1,0 +1,124 @@
+.leftdiv {
+    width: 60%;
+    display: inline-block;
+    margin-left: 10%;
+    margin-top: 2%;
+    float: left;
+}
+
+.shipping {
+    padding: 2%;
+    height: 420px;
+}
+
+.shippingtext {
+    font-family: Palatino, Georgia, 'Times New Roman', Times, serif;
+    font-size: 25px;
+    font-style: normal;
+    font-variant: normal;
+    color: grey;
+    float: left;
+    padding-right: 90%;
+    margin-left: -2%;
+    margin-top: 0;
+}
+
+.halfinputdiv {
+    width: 45%;
+    float: left;
+    margin-right: 5%;
+    margin-top: 2%;
+}
+
+.wholeinputdiv {
+    width: 95%;
+    float: left;
+    margin-top: 2%;
+}
+
+.label {
+    font-family: Palatino, Georgia, 'Times New Roman', Times, serif;
+    font-size: 16px;
+    font-style: normal;
+    font-variant: normal;
+    color: grey;
+    display: block;
+    float: left;
+    margin-bottom: 0.5%;
+}
+
+.input {
+    width: 100%;
+    display: block;
+    height: 20px;
+}
+
+.label:focus:valid {
+    background-color: paleturquoise;
+}
+
+.payment {
+    padding: 1% 2%;
+    height: 300px;
+}
+
+.paymenttext {
+    font-family: Palatino, Georgia, 'Times New Roman', Times, serif;
+    font-size: 25px;
+    font-style: normal;
+    font-variant: normal;
+    color: grey;
+    padding-right: 90%;
+    margin-left: -2%;
+}
+
+.paybutton {
+    width: 10%;
+    margin-top: 5%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: paleturquoise;
+}
+
+.paybutton:hover {
+    box-shadow: 0 5px 5px 0 grey;
+}
+
+.rightdiv {
+    width: 20%;
+    padding: 2%;
+    float: left;
+    margin-top: 2%;
+    background-color: whitesmoke;
+}
+
+.carttext {
+    font-family: Palatino, Georgia, 'Times New Roman', Times, serif;
+    font-size: 25px;
+    font-style: normal;
+    font-variant: normal;
+    float: left;
+    color: grey;
+}
+
+.item {
+    width: 70%;
+    font-size: 15px;
+}
+
+.cartleftdiv {
+    width: 80%;
+    display: block;
+    float: left;
+    text-align: left;
+    color: dimgrey;
+}
+
+.cartrightdiv {
+    width: 15%;
+    display: block;
+    float: right;
+    color: dimgrey;
+}
