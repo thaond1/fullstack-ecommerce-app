@@ -1,7 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Terminal command "npm run dev" starts the front end React app on http://localhost:3000/ and the back end NodeJS on http://localhost:5000/
-Running both servesr is possible by using concurrently package and configuring run concurrently in the package file
+Running both servers is possible by using concurrently package and configuring run concurrently in the package file.
 
 
 Below you will find some information on how to perform common tasks.<br>
