@@ -1,0 +1,69 @@
+.contact, .shipping, .policies {
+    width: 70%;
+    padding: 20px 30px;
+    margin: 0 auto;
+    font-family: Palatino, Georgia, 'Times New Roman', Times, serif;
+    font-size: 0.9em;
+    color: rgb(100, 100, 100);
+}
+
+.section {
+    width: 80%;
+    height: 50px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-weight: bold;
+    font-size: 1.5em;
+    display: inline-block;
+}
+
+.section p {
+    float: center;
+}
+
+.info {
+    width: 40%;
+    margin: auto;
+}
+
+.left {
+    width: 25%;
+    float: left;
+}
+
+.right {
+    width: 75%;
+    float: left;
+    text-align: left;
+}
+
+.shippingtable {
+    width: 60%;
+    margin: 1% auto 0 auto;
+    border-collapse: collapse;
+}
+
+.tri1, .tri2, .tri3 {
+    padding: 10px;
+    border: 1px solid #dddddd;
+}
+
+.tri1 {
+    width: 20%;
+}
+
+.tri2 {
+    width: 50%;
+}
+
+.tri3 {
+    width: 30%;
+}
+
+.policies {
+    margin-top: -11%;
+}
+
+.policies .info p {
+    text-align: left;
+    line-height: 1.5em;
+}

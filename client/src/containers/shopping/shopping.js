@@ -15,6 +15,7 @@ import cart from "../../shopping-cart.png"
 */
 
 const stripePromise = loadStripe("pk_test_51HMbwoHlAknTTFclFX9flu2gFYw5F6M3EA0wjLso2UQX3tCRJnqnTadcX3tJ9F7aAn7W6nmTjl1EtU3ck6J30LjN00mplj1f3s");
+var myStorage = window.sessionStorage;
 
 class Shopping extends Component {
     // modalItemId and addingItemAmount are used together when adding to cart
@@ -38,10 +39,14 @@ class Shopping extends Component {
         fetch('/inventory')
             .then(res => res.json())
             .then(myinventory => this.setState({inventory: myinventory}))
+        if (myStorage.currentCart !== undefined) {
+            this.setState({cart: JSON.parse(myStorage.currentCart)})
+        }
+        
     }
 
     handleViewPopup = (itemId) => {
-        this.setState({showModal: true, modalItemId: itemId}, ()=>{console.log(itemId)});
+        this.setState({showModal: true, modalItemId: itemId});
     }
 
     closeViewPopup = () => {
@@ -67,7 +72,7 @@ class Shopping extends Component {
             this.setState({cart: [...this.state.cart, {id: index, amount: parseInt(this.state.addingItemAmount)}]},
             () => {this.closeViewPopup();
                 event.persist();
-                console.log(this.state.cart);})
+                myStorage.setItem('currentCart', JSON.stringify(this.state.cart));})
         }
         else {                              // item already in cart, adding more
             var currentAmount = itemInCart.amount;
@@ -81,14 +86,14 @@ class Shopping extends Component {
                     () => {this.closeViewPopup();
                         event.persist();
                         window.alert("Amount exceeds items in stock. Adding all items in inventory.");
-                        console.log(this.state.cart);});
+                        myStorage.setItem('currentCart', JSON.stringify(this.state.cart));});
             }
             else {                          // not exceeding max amount in stock, sum up two amounts
                 newCart[cartIndex].amount = parseInt(this.state.addingItemAmount)+currentAmount
                 this.setState({cart: newCart},
                     () => {this.closeViewPopup();
                         event.persist();
-                        console.log(this.state.cart);});
+                        myStorage.setItem('currentCart', JSON.stringify(this.state.cart));});
             }
         }
     }
@@ -110,7 +115,6 @@ class Shopping extends Component {
 
     checkout = () => {
         // make call to fetch /checkout
-        console.log("body of POST", JSON.stringify({myCart: this.state.cart}))
         fetch('/checkout', {
             method: 'POST',
             headers: {
@@ -124,7 +128,6 @@ class Shopping extends Component {
         // When server returns with intent, set onCheckout state to show payment modal
         // When user submits card info, call stripe.confirmCardPayment() with the client secret.
         this.setState({onCheckout: true})
-        console.log("Success! Set state and client secret.")
     }
 
 
@@ -138,6 +141,7 @@ class Shopping extends Component {
             var newCart = [...this.state.cart];
             (newCart[this.state.cart.findIndex( item => item.id === cartId)].amount)++;
             this.setState({cart: newCart});
+            myStorage.setItem('currentCart', JSON.stringify(newCart));
         }
     }
 
@@ -148,10 +152,12 @@ class Shopping extends Component {
         if (cartAmount-1 > 0) {     // no, decrement
             (newCart[this.state.cart.findIndex( item => item.id === cartId)].amount)--;
             this.setState({cart: newCart});
+            myStorage.setItem('currentCart', JSON.stringify(newCart));
         }
         else {              // remove from cart
             newCart.splice(this.state.cart.findIndex( item => item.id === cartId), 1);
             this.setState({cart: newCart});
+            myStorage.setItem('currentCart', JSON.stringify(newCart));
         }
     }
 
@@ -164,7 +170,6 @@ class Shopping extends Component {
         if (this.state.filter !== "all") {
             filteredList = this.state.inventory.filter( item => item.category === this.state.filter)
         }
-
         // using index to locate item to be displayed but can be changed (bind(this,item.index)=>item.id)
         return (
 

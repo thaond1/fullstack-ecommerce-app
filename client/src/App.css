@@ -16,19 +16,45 @@
   background-position-y: 60%;
 }
 
-.App-title {
-  font-size: 1.5em;
-  font-weight: lighter;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  color: white;
-}
-
 .App-intro {
   font-size: large;
 }
 
 .App {
   overflow-x: hidden;
+}
+
+.navbar {
+  width: 100%;
+  max-height: 50px;
+  position: fixed;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.navlink {
+  margin-top: -5%;
+  margin-left: 0.3%;
+  color: white;
+  font-size: 0.9em;
+  list-style-type: none;
+  display: inline-block;
+}
+
+.link {
+  padding: 10px 15px;
+  white-space: nowrap;
+  background-color: rgba(255, 255, 255, 0.80);
+}
+
+.link, .link:visited {
+  text-decoration: none;
+  color: black;
+}
+
+.link:hover {
+  background-color: skyblue;
+  color: white;
 }
 
 @keyframes App-logo-spin {

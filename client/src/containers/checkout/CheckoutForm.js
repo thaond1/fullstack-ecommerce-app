@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useStripe, useElements, CardElement} from '@stripe/react-stripe-js';
 
+import Thankyou from './thankyou'
 import CardSection from './CardSection';
 import './CheckoutForm.css'
 
@@ -8,7 +9,8 @@ const CheckoutForm = (props) => {
   const stripe = useStripe();
   const elements = useElements();
   const [checkoutState, setCheckoutState] = useState({
-    firstname: '', lastname: '', address: '', city: '', zip: '', state: '', email: '', cardname: ''
+    firstname: '', lastname: '', address: '', city: '', zip: '', state: '', email: '', cardname: '',
+    paid: false
   })
   var total = 0
 
@@ -39,6 +41,10 @@ const CheckoutForm = (props) => {
     setCheckoutState({...checkoutState, cardname: event.target.value})
   }
 
+  const invertPaid = () => {
+    setCheckoutState({...checkoutState, paid: !(checkoutState.paid)})
+  }
+
   const handleSubmit = async (event) => {
     // We don't want to let default form submission happen here,
     // which would refresh the page.
@@ -53,7 +59,8 @@ const CheckoutForm = (props) => {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          name: checkoutState.cardname
+          name: checkoutState.cardname,
+          email: checkoutState.email,
         }
       },
       shipping: {
@@ -71,7 +78,7 @@ const CheckoutForm = (props) => {
 
     if (result.error) {
       // Show error to your customer (e.g., insufficient funds)
-      console.log(result.error.message);
+      window.alert(result.error.message);
     } else {
       // The payment has been processed!
       if (result.paymentIntent.status === 'succeeded') {
@@ -80,84 +87,92 @@ const CheckoutForm = (props) => {
         // execution. Set up a webhook or plugin to listen for the
         // payment_intent.succeeded event that handles any business critical
         // post-payment actions.
-        props.redirect()
+        invertPaid();     // to display thankyou
+        setTimeout( () => {invertPaid();  props.redirect();}, 5000)
       }
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="leftdiv">
-        <div className="shipping">
-          <p className="shippingtext"> Shipping </p>
-          <div className="halfinputdiv">
-            <label className="label"> First Name</label>
-            <input type="text" className="input" onChange={(event) => setFirstName(event)}></input>
+  if (checkoutState.paid === true) {
+    return <Thankyou name={checkoutState.firstname} email={checkoutState.email}>
+    </Thankyou>;
+  }
+
+  else {
+    return (
+      <form onSubmit={handleSubmit}>
+        <div className="leftdiv">
+          <div className="shipping">
+            <p className="shippingtext"> Shipping </p>
+            <div className="halfinputdiv">
+              <label className="label"> First Name</label>
+              <input type="text" className="input" onChange={(event) => setFirstName(event)}></input>
+            </div>
+            <div className="halfinputdiv">
+              <label className="label"> Last Name </label>
+              <input type="text" className="input" onChange={(event) => setLastName(event)}></input>
+            </div>
+            <div className="wholeinputdiv">
+              <label className="label"> Street Address </label>
+              <input type="text" className="input" onChange={(event) => setAddress(event)}></input>
+            </div>
+            <div className="halfinputdiv">
+              <label className="label"> City </label>
+              <input type="text" className="input" onChange={(event) => setCity(event)}></input>
+            </div>
+            <div className="halfinputdiv">
+              <label className="label"> ZIP Code </label>
+              <input type="text" className="input" onChange={(event) => setZip(event)}></input>
+            </div>
+            <div className="halfinputdiv">
+              <label className="label"> State </label>
+              <input type="text" className="input" onChange={(event) => setState(event)}></input>
+            </div>
+            <div className="wholeinputdiv">
+              <label className="label"> Email </label>
+              <input type="email" className="input" onChange={(event) => setEmail(event)}></input>
+            </div>
           </div>
-          <div className="halfinputdiv">
-            <label className="label"> Last Name </label>
-            <input type="text" className="input" onChange={(event) => setLastName(event)}></input>
-          </div>
-          <div className="wholeinputdiv">
-            <label className="label"> Street Address </label>
-            <input type="text" className="input" onChange={(event) => setAddress(event)}></input>
-          </div>
-          <div className="halfinputdiv">
-            <label className="label"> City </label>
-            <input type="text" className="input" onChange={(event) => setCity(event)}></input>
-          </div>
-          <div className="halfinputdiv">
-            <label className="label"> ZIP Code </label>
-            <input type="text" className="input" onChange={(event) => setZip(event)}></input>
-          </div>
-          <div className="halfinputdiv">
-            <label className="label"> State </label>
-            <input type="text" className="input" onChange={(event) => setState(event)}></input>
-          </div>
-          <div className="wholeinputdiv">
-            <label className="label"> Email </label>
-            <input type="email" className="input" onChange={(event) => setEmail(event)}></input>
+  
+          <div className="payment">
+            <p className="paymenttext"> Payment </p>
+            <div className="wholeinputdiv">
+              <label className="label"> Name on Card </label>
+              <input type="text" className="input" onChange={(event) => setCardName(event)}></input>
+            </div>
+            <CardSection/>
+            <button className="paybutton" disabled={!stripe}>Pay</button>
           </div>
         </div>
-
-        <div className="payment">
-          <p className="paymenttext"> Payment </p>
-          <div className="wholeinputdiv">
-            <label className="label"> Name on Card </label>
-            <input type="text" className="input" onChange={(event) => setCardName(event)}></input>
+  
+        <div className="rightdiv">
+          <p className="carttext"> Cart Summary </p>
+          {props.cart.map( i => 
+            { const item = props.inventory[i.id]
+              total = total + item.price*i.amount
+              return <div className="item"> 
+                        <p className="cartleftdiv"> {item.name}({i.amount}) </p> 
+                        <p className="cartrightdiv"> {(item.price*i.amount).toFixed(2)} </p>
+                      </div> })}
+          <div className="item">
+            <p className="cartleftdiv"> Subtotal </p>
+            <p className="cartrightdiv"> ${total.toFixed(2)} </p>
           </div>
-          <CardSection/>
-          <button className="paybutton" disabled={!stripe}>Pay</button>
+  
+          <div className="item">
+            <p className="cartleftdiv"> Tax ({props.tax*100}%) </p>
+            <p className="cartrightdiv"> ${total*props.tax.toFixed(2)} </p>
+          </div>
+  
+          <div className="item">
+            <p className="cartleftdiv"> Total </p>
+            <p className="cartrightdiv"> ${(total + total*props.tax).toFixed(2)} </p>
+          </div>
         </div>
-      </div>
-
-      <div className="rightdiv">
-        <p className="carttext"> Cart Summary </p>
-        {props.cart.map( i => 
-          { const item = props.inventory[i.id]
-            total = total + item.price*i.amount
-            return <div className="item"> 
-                      <p className="cartleftdiv"> {item.name}({i.amount}) </p> 
-                      <p className="cartrightdiv"> {(item.price*i.amount).toFixed(2)} </p>
-                    </div> })}
-        <div className="item">
-          <p className="cartleftdiv"> Subtotal </p>
-          <p className="cartrightdiv"> ${total.toFixed(2)} </p>
-        </div>
-
-        <div className="item">
-          <p className="cartleftdiv"> Tax ({props.tax*100}%) </p>
-          <p className="cartrightdiv"> ${total*props.tax.toFixed(2)} </p>
-        </div>
-
-        <div className="item">
-          <p className="cartleftdiv"> Total </p>
-          <p className="cartrightdiv"> ${(total + total*props.tax).toFixed(2)} </p>
-        </div>
-      </div>
-
-    </form>
-  );
+  
+      </form>
+    );
+  }
 }
 
 export default CheckoutForm;

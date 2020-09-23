@@ -6,12 +6,13 @@
 }
 
 .shoppingcart {
-    position: absolute;
+    position: fixed;
     left: 95%;
-    top: 5%;
+    top: 1.5%;
     width: 30px;
     height: 30px; 
-    cursor: pointer; 
+    cursor: pointer;
+    z-index: 0;
 }
 
 .checkoutmodal {
@@ -25,10 +26,10 @@
 }
 
 .itemamount {
-    position: absolute;
+    position: fixed;
     padding: 1px 3px;
     left: 97.1%;
-    top: 3.9%;
+    top: 1%;
     background-color: rgb(80, 79, 79);
     color: white;
 }
