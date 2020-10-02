@@ -2,8 +2,11 @@ Instructions to run the application:
 
 Make sure you have React, Nodejs installed on your device.
 You can download the Node package manager and Nodejs from https://www.nodejs.org/en or check if you have the most recent versions on your computer with terminal commands "npm -v" and "node -v" on the terminal.
+
 Open a terminal and install react globally with "npm create-react-app -g". Try adding sudo before npm if there is an installation permission error.
+
 Install Express and the concurrently package (for starting client and server hosts using a single command) with terminal command "npm i express concurrently".
+
 Download the entire folder of this project, and navigate to this directory on your machine.
 
 Run terminal command "npm run dev" to start start the front end React app on http://localhost:3000/ and the back end NodeJS on http://localhost:5000/
