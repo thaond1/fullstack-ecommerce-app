@@ -1,11 +1,19 @@
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+Instructions to run the application:
 
-Terminal command "npm run dev" starts the front end React app on http://localhost:3000/ and the back end NodeJS on http://localhost:5000/
-Running both servers is possible by using concurrently package and configuring run concurrently in the package file.
+Make sure you have React, Nodejs installed on your device.
+You can download the Node package manager and Nodejs from https://www.nodejs.org/en or check if you have the most recent versions on your computer with terminal commands "npm -v" and "node -v" on the terminal.
+Open a terminal and install react globally with "npm create-react-app -g". Try adding sudo before npm if there is an installation permission error.
+Install Express and the concurrently package (for starting client and server hosts using a single command) with terminal command "npm i express concurrently".
+Download the entire folder of this project, and navigate to this directory on your machine.
+
+Run terminal command "npm run dev" to start start the front end React app on http://localhost:3000/ and the back end NodeJS on http://localhost:5000/
+(Running both servers is possible by using concurrently package and configuring run concurrently in the package.json file.)
 
 
 Below you will find some information on how to perform common tasks.<br>
 You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
+
+This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 ## Table of Contents
 
